@@ -1,13 +1,13 @@
-import { createServer } from "http"
-import { createSchema, createYoga } from "graphql-yoga"
-import { tasks } from "./sample.mjs"
-import { connect } from "./database.mjs"
-import User from "../models/User.mjs"
+import {createServer} from 'http';
+import {createSchema, createYoga} from 'graphql-yoga';
+import {tasks} from './sample.mjs';
+import {connect} from './database.mjs';
+import User from '../models/User.mjs';
 
 createServer(
     createYoga({
-        schema: createSchema({
-            typeDefs: `
+      schema: createSchema({
+        typeDefs: `
         type Query {
             hello: String
             required_greet(name: String!): String
@@ -49,43 +49,43 @@ createServer(
             number: Int
         }
       `,
-            resolvers: {
-                Query: {
-                    hello: () => "Hello Hello Hello",
+        resolvers: {
+          Query: {
+            hello: () => 'Hello Hello Hello',
 
-                    required_greet: (_, { name }) => `Hello from required greet ${name}`,
+            required_greet: (_, {name}) => `Hello from required greet ${name}`,
 
-                    greet: (_, { name }) => `Hello from non required greet ${name}`,
+            greet: (_, {name}) => `Hello from non required greet ${name}`,
 
-                    tasks: () => tasks,
+            tasks: () => tasks,
 
-                    async Users() {
-                        return await User.find();
-                    }
-                },
-                Mutation: {
-                    createTask(_, { input }) {
-                        input._id = tasks.length;
-                        tasks.push(input);
-                        return input;
-                    },
-                    async createUser(_, { input }) {
-                        const newUser = new User(input);
-                        await newUser.save();
-                        return newUser;
-                    },
-                    async deleteUser(_, { _id }) {
-                        return await User.findByIdAndDelete(_id);
-                    },
-                    async updateUser(_, { _id, input }) {
-                        return await User.findByIdAndUpdate(_id, input, { new: true });
-                    }
-                },
+            async Users() {
+              return await User.find();
             },
-        }),
-    })
+          },
+          Mutation: {
+            createTask(_, {input}) {
+              input._id = tasks.length;
+              tasks.push(input);
+              return input;
+            },
+            async createUser(_, {input}) {
+              const newUser = new User(input);
+              await newUser.save();
+              return newUser;
+            },
+            async deleteUser(_, {_id}) {
+              return await User.findByIdAndDelete(_id);
+            },
+            async updateUser(_, {_id, input}) {
+              return await User.findByIdAndUpdate(_id, input, {new: true});
+            },
+          },
+        },
+      }),
+    }),
 ).listen(4000, () => {
-    console.info("GraphQL Yoga is listening on http://localhost:4000/graphql")
-})
+  console.info('GraphQL Yoga is listening on http://localhost:4000/graphql');
+});
 
 connect();
